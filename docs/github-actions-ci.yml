@@ -1,0 +1,27 @@
+# CI definition for ai-guardrails-layer.
+# NOTE: this file lives under docs/ because the push integration used
+# for this repo cannot write .github/workflows/ (it lacks the Workflows
+# permission). To activate CI, move this file to .github/workflows/ci.yml.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -r requirements.txt
+      - run: pip install -e .
+      - run: pytest -q
+      - run: python examples/run_demo.py
